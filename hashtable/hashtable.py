@@ -22,7 +22,10 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
+        self.count = 0
 
+        self.capacity = capacity
+        self.hashTable = [None] * capacity
 
     def get_num_slots(self):
         """
@@ -34,6 +37,7 @@ class HashTable:
 
         Implement this.
         """
+        return len(self.hashTable)
         # Your code here
 
 
@@ -43,17 +47,18 @@ class HashTable:
 
         Implement this.
         """
+        return self.count / self.capacity # will return in decimal form of how full the capacity is.
         # Your code here
 
 
-    def fnv1(self, key):
-        """
-        FNV-1 Hash, 64-bit
+    # def fnv1(self, key):
+    #     """
+    #     FNV-1 Hash, 64-bit
 
-        Implement this, and/or DJB2.
-        """
+    #     Implement this, and/or DJB2.
+    #     """
 
-        # Your code here
+    #     # Your code here
 
 
     def djb2(self, key):
@@ -62,7 +67,11 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
+        hash = 5381
+        for x in key: # x is a character , key is the string
+            hash = (( hash << 5) + hash) + ord(x) #shifting 5 bits, adding hash value, chaning the character value into an int value.
+            hash &= 0xFFFFFFFF # hash after making a random number out of it.
+        return hash
 
 
     def hash_index(self, key):
@@ -70,6 +79,9 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
+
+
+
         #return self.fnv1(key) % self.capacity
         return self.djb2(key) % self.capacity
 
@@ -81,6 +93,8 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
+        self.hashTable[index]=value
         # Your code here
 
 
@@ -92,6 +106,8 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
+        self.hashTable[index] = None
         # Your code here
 
 
@@ -103,6 +119,9 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
+        return self.hashTable[index]
+
         # Your code here
 
 
