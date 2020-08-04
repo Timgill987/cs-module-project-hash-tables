@@ -6,6 +6,44 @@ class HashTableEntry:
         self.key = key
         self.value = value
         self.next = None
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def find(self, key):
+        current = self.head
+
+        while current is not None:
+            if current.key == key:
+                return current
+            current = current.next
+
+        return current
+
+    def update_or_else_insert_at_head(self, key, value):
+        # check if the key is already in the linked list
+            # find the node
+        current = self.head
+        while current is not None:
+            # if key is found, change the value
+            if current.key == key:
+                current.value = value
+                # exit function immediately
+                return
+            current = current.next
+
+        # if we reach the end of the list, it's not here!
+        # make a new node, and insert at head
+        new_node = HashTableEntry(key, value)
+        new_node.next = self.head
+        self.head = new_node
+
+    def del_element(self, HashTableEntry):
+        current = self.head
+        while current.next != HashTableEntry:
+            current = current.next
+        current.next = HashTableEntry.next
+        del HashTableEntry
 
 
 # Hash table can't have fewer than this many slots
@@ -23,7 +61,7 @@ class HashTable:
     def __init__(self, capacity):
         # Your code here
         self.count = 0
-
+# set capacity and table to empty
         self.capacity = capacity
         self.hashTable = [None] * capacity
 
@@ -47,7 +85,8 @@ class HashTable:
 
         Implement this.
         """
-        return self.count / self.capacity # will return in decimal form of how full the capacity is.
+        return self.count / self.capacity
+        # will return in decimal form of how full the capacity is.
         # Your code here
 
 
@@ -69,7 +108,7 @@ class HashTable:
         """
         hash = 5381
         for x in key: # x is a character , key is the string
-            hash = (( hash << 5) + hash) + ord(x) #shifting 5 bits, adding hash value, chaning the character value into an int value.
+            hash = (( hash << 5) + hash) + ord(x) #shifting 5 bits to the left, adding hash value, chaning the character value into an int value.
             hash &= 0xFFFFFFFF # hash after making a random number out of it.
         return hash
 
@@ -94,8 +133,10 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        self.hashTable[index]=value
-        # Your code here
+        #setting the specified index to the user given value
+        self.hashTable[index].update_or_else_insert_at_head(key, value)
+        if self.get_load_factor() > .7:
+            self.resize(self.capacity * 2)
 
 
     def delete(self, key):
@@ -106,8 +147,12 @@ class HashTable:
 
         Implement this.
         """
-        index = self.hash_index(key)
-        self.hashTable[index] = None
+        #setting the value of the given index to none effectivly deleteing the index/value
+
+        HashTableEntry = self.hashTable[self.hash_index(key)].find(key)
+        self.hashTable[self.hash_index(key)].del_element(HashTableEntry)
+        # index = self.hash_index(key)
+        # self.hashTable[index].find(key)
         # Your code here
 
 
@@ -132,6 +177,17 @@ class HashTable:
 
         Implement this.
         """
+        self.capacity = new_capacity
+
+        self.hashTable = [[HashTableEntry(i, None)] for x in range(self.capacity)]
+
+
+        for i in self.hashTable:
+            for j in i:
+                if j.value is not None:
+                    self.put(j.key,j.value)
+
+
         # Your code here
 
 
