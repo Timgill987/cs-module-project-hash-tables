@@ -93,7 +93,8 @@ class HashTable:
 
         Implement this.
         """
-        self.hashTable.append([self.hash_index(key), value])
+        index = self.hash_index(key)
+        self.hashTable[index]=value
         # Your code here
 
 
@@ -105,7 +106,8 @@ class HashTable:
 
         Implement this.
         """
-        self.hashTable.remove([self.hash_index(key)])
+        index = self.hash_index(key)
+        self.hashTable[index] = None
         # Your code here
 
 
@@ -117,12 +119,9 @@ class HashTable:
 
         Implement this.
         """
-        
-        self.hashTable[self.hash_index(key)]
-        if key != key:
-            return None
-        else:
-            return key
+        index = self.hash_index(key)
+        return self.hashTable[index]
+
         # Your code here
 
 
