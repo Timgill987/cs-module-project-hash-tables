@@ -38,12 +38,16 @@ class LinkedList:
         new_node.next = self.head
         self.head = new_node
 
-    def del_element(self, HashTableEntry):
+    def del_element(self, hashTableEntry):
         current = self.head
-        while current.next != HashTableEntry:
+        if current == hashTableEntry:
+            self.head = self.head.next
+            del hashTableEntry
+            return
+        while current.next != hashTableEntry:
             current = current.next
-        current.next = HashTableEntry.next
-        del HashTableEntry
+        current.next = hashTableEntry.next
+        del hashTableEntry
 
 
 # Hash table can't have fewer than this many slots
@@ -63,7 +67,8 @@ class HashTable:
         self.count = 0
 # set capacity and table to empty
         self.capacity = capacity
-        self.hashTable = [None] * capacity
+        # self.hashTable = [None] * capacity
+        self.hashTable = [LinkedList()] * self.capacity
 
     def get_num_slots(self):
         """
@@ -150,6 +155,9 @@ class HashTable:
         #setting the value of the given index to none effectivly deleteing the index/value
 
         HashTableEntry = self.hashTable[self.hash_index(key)].find(key)
+        if HashTableEntry is None:
+            print('Key: '+key+' does not exist')
+            return
         self.hashTable[self.hash_index(key)].del_element(HashTableEntry)
         # index = self.hash_index(key)
         # self.hashTable[index].find(key)
@@ -165,7 +173,10 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        return self.hashTable[index]
+        entry = self.hashTable[index].find(key)
+        if entry is not None:
+            return entry.value
+        return None
 
         # Your code here
 
@@ -178,14 +189,17 @@ class HashTable:
         Implement this.
         """
         self.capacity = new_capacity
+        oldTable = self.hashTable
+        self.hashTable = [LinkedList()] * self.capacity
 
-        self.hashTable = [[HashTableEntry(i, None)] for x in range(self.capacity)]
 
+        for i in oldTable:
+            current = i.head
 
-        for i in self.hashTable:
-            for j in i:
-                if j.value is not None:
-                    self.put(j.key,j.value)
+            while current is not None:
+                # print("putting key/value", current.key, current.value)
+                self.put(current.key, current.value)
+                current = current.next
 
 
         # Your code here
