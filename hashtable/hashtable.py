@@ -6,6 +6,54 @@ class HashTableEntry:
         self.key = key
         self.value = value
         self.next = None
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def find(self, key):
+        current = self.head
+        #while current is not None
+        while current is not None:
+            #if the current's key is equal to the key we're looking for
+            if current.key == key:
+                #return the value
+                return current
+            # move to the next item otherwise
+            current = current.next
+
+        return current
+
+    def update_or_else_insert_at_head(self, key, value):
+        # check if the key is already in the linked list
+            # find the node
+        current = self.head
+        while current is not None:
+            # if key is found, change the value
+            if current.key == key:
+                current.value = value
+                # exit function immediately
+                return
+            current = current.next
+
+        # if we reach the end of the list, it's not here!
+        # make a new node, and insert at head
+        new_node = HashTableEntry(key, value)
+        new_node.next = self.head
+        self.head = new_node
+
+    def del_element(self, hashTableEntry):
+        current = self.head
+        # base case to check if the first element == to hashtableentry
+        if current == hashTableEntry:
+            self.head = self.head.next
+            del hashTableEntry
+            return
+            # while the next element isn't hashTableEntry, we move one to the right
+        while current.next != hashTableEntry:
+            current = current.next
+        # delete hashtable entry
+        current.next = hashTableEntry.next
+        del hashTableEntry
 
 
 # Hash table can't have fewer than this many slots
@@ -23,9 +71,10 @@ class HashTable:
     def __init__(self, capacity):
         # Your code here
         self.count = 0
-
+# set capacity and table to empty
         self.capacity = capacity
-        self.hashTable = [None] * capacity
+        # self.hashTable = [None] * capacity
+        self.hashTable = [LinkedList()] * self.capacity
 
     def get_num_slots(self):
         """
@@ -47,7 +96,10 @@ class HashTable:
 
         Implement this.
         """
-        return self.count / self.capacity # will return in decimal form of how full the capacity is.
+        # monitoring the percentage of what is in the hash table
+        # works with resize function
+        return self.count / self.capacity
+        # will return in decimal form of how full the capacity is.
         # Your code here
 
 
@@ -69,7 +121,7 @@ class HashTable:
         """
         hash = 5381
         for x in key: # x is a character , key is the string
-            hash = (( hash << 5) + hash) + ord(x) #shifting 5 bits, adding hash value, chaning the character value into an int value.
+            hash = (( hash << 5) + hash) + ord(x) #shifting 5 bits to the left, adding hash value, chaning the character value into an int value.
             hash &= 0xFFFFFFFF # hash after making a random number out of it.
         return hash
 
@@ -94,8 +146,12 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        self.hashTable[index]=value
-        # Your code here
+        #setting the specified index to the user given value
+        #setting the specified Node to a new value if the key exist
+        self.hashTable[index].update_or_else_insert_at_head(key, value)
+        # as the put function is loading the hash table, if the capacity gets to 70%, we double the size of the has table
+        if self.get_load_factor() > .7:
+            self.resize(self.capacity * 2)
 
 
     def delete(self, key):
@@ -106,9 +162,16 @@ class HashTable:
 
         Implement this.
         """
-        index = self.hash_index(key)
-        self.hashTable[index] = None
-        # Your code here
+        #setting the node to delete to the specified key of the hashtable index
+        # and setting it to the key of the LL within the hashtable
+        HashTableEntry = self.hashTable[self.hash_index(key)].find(key)
+        # if the specified node is None
+        # we don't delete anything because there is nothing there
+        if HashTableEntry is None:
+            print('Key: '+key+' does not exist')
+            return
+        # otherwise we are deleteing it.
+        self.hashTable[self.hash_index(key)].del_element(HashTableEntry)
 
 
     def get(self, key):
@@ -119,8 +182,16 @@ class HashTable:
 
         Implement this.
         """
+        #setting index variable to the hash_index function to find the given key
         index = self.hash_index(key)
-        return self.hashTable[index]
+        # searching for the correct node (hashtableentry)
+        entry = self.hashTable[index].find(key)
+        # if node is not None
+        if entry is not None:
+            #return what we found
+            return entry.value
+        # else return none
+        return None
 
         # Your code here
 
@@ -132,6 +203,24 @@ class HashTable:
 
         Implement this.
         """
+        self.capacity = new_capacity
+        # declaring old hash table to copy over into new bigger one
+        oldTable = self.hashTable
+        # default size of the current hash table
+        self.hashTable = [LinkedList()] * self.capacity
+
+        # iterating through old table
+        for i in oldTable:
+            #starting at the first index
+            current = i.head
+            #while each index is not None
+            while current is not None:
+                # print("putting key/value", current.key, current.value)
+                #push all contents into new hash table, The rest happens in the put function (scroll up)
+                self.put(current.key, current.value)
+                current = current.next
+
+
         # Your code here
 
 
