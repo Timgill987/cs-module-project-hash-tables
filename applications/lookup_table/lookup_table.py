@@ -1,3 +1,6 @@
+import random
+import math
+
 # Your code here
 
 
@@ -9,12 +12,21 @@ def slowfun_too_slow(x, y):
 
     return v
 
+
+
+c = {}
+
 def slowfun(x, y):
     """
     Rewrite slowfun_too_slow() in here so that the program produces the same
     output, but completes quickly instead of taking ages to run.
     """
     # Your code here
+    key = (x, y)
+
+    if key not in c:
+        c[key] = slowfun_too_slow(key[0], key[1])
+    return c[key]
 
 
 
